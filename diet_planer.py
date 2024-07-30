@@ -228,7 +228,7 @@ class dietplaner_UI(QMainWindow):
             - None
 
         Output:
-            - Meals object that contain every meal. [dict]
+            - meals: Meals object that contain every meal. [dict]
         '''
         num_rows = self.recepies.values.shape[0]
         row_ = []
@@ -252,6 +252,17 @@ class dietplaner_UI(QMainWindow):
     
     def choose_meals(self,
                      key:str, num_meals:int): # return list of num_meals meals
+        '''
+        Choose random meals based on the given meals in the .xlsx file
+
+        Input:
+            - key: key string that defines which meal type is used. Possible values are "Frühstück", "Mittagessen", "Abendessen" und "Snack". [str]
+            - num_meals: number of meals that are needed for e.g., breakfasts. [int]
+
+        Output:
+            - possible_meals: dictionaries that contain the ingredients for every meal that is returned. [list of dicts]
+            - possible_meals_keys: list of keys that represent the meal for which the ingredients are listed in variable "possible_meals". [list of str]
+        '''
 
         possible_meals = self.meals[key]
         possible_meals_idx = randint(0, len(possible_meals), size=num_meals)
@@ -260,6 +271,19 @@ class dietplaner_UI(QMainWindow):
         return possible_meals, possible_meals_keys
 
     def adjust_portion(self, meals_, meal_type):
+        '''
+        Adjust the portion size of all meals for one meal_type, e.g., breakfast.
+
+        Input: 
+            - meals_: all meals that are listed for one meal_type, e.g., breakfast. List with two entries.
+            First entry is the dict. that contains all the ingredients of the meals.
+            The second entry stores all the meals'names. [list]
+            meal_type: type of meal the is adjusted, e.g., breakfast. [str]
+        
+        Outout: 
+            - adjusted meal ingredients. [list of dicts]
+            - meal names. [list of str]
+        '''
         def myround(x, base=5):
             return base * round(x/base)
         
@@ -307,6 +331,27 @@ class dietplaner_UI(QMainWindow):
         return meals, meals_[1]
 
     def calculate_meals(self):
+        '''
+        Main function to calculate the meals for each week. First checks how many meals per day
+        and time are necessary, then chooses the meals and adjusts them accoridng to the given calorie limits
+
+        Input:
+            - 
+
+        Output:
+            - breakfasts: All meals that are listed for breakfast. List with two entries.
+            First entry is the dict. that contains all the ingredients of the meals.
+            The second entry stores all the meals'names. [list]
+            - lunches: All meals that are listed for lunches. List with two entries.
+            First entry is the dict. that contains all the ingredients of the meals.
+            The second entry stores all the meals'names. [list]
+            - dinners: All meals that are listed for dinners. List with two entries.
+            First entry is the dict. that contains all the ingredients of the meals.
+            The second entry stores all the meals'names. [list]
+            - snacks: All meals that are listed for snacks. List with two entries.
+            First entry is the dict. that contains all the ingredients of the meals.
+            The second entry stores all the meals'names. [list]
+        '''
         num_breakfasts, num_lunch, num_dinner, num_snack = self.check_setting()
         breakfasts = self.adjust_portion(self.choose_meals('Frühstück', num_breakfasts), 'Frühstück') # get list of dicts of breakfasts
         lunches = self.adjust_portion(self.choose_meals('Mittagessen', num_lunch), 'Mittagessen') # get list of dicts of lunches
@@ -315,6 +360,17 @@ class dietplaner_UI(QMainWindow):
         return breakfasts, lunches, dinners, snacks
         
     def create_pdf_weekplan(self):
+        '''
+        This function is called when the "Create Weekplan" button is pushed on the UI.
+        It calculates the meals and puts them into a PDF as well as a shopping
+        list, which is created in a seperate PDF file.
+
+        Input:
+            - 
+
+        Output:
+            - 
+        '''
         def create_pdf_data(breakfasts, lunches, dinners, snacks):
             data_pdf = [['', 'Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']]
             indices = []
